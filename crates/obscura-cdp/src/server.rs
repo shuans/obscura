@@ -400,13 +400,29 @@ async fn process_cdp_message(
 
     let response = dispatch::dispatch(&req, ctx).await;
 
-    if let Ok(json) = serde_json::to_string(&response) {
-        let _ = reply_tx.send(json);
-    }
+    // Playwright expects Target.createTarget/attachToTarget side-effect events
+    // (Target.targetCreated/Target.attachedToTarget) to be observed before
+    // the command response is handled. Otherwise browserContext.newPage()
+    // may resolve targetId first and fail to find the mapped page.
+    let events_first = matches!(req.method.as_str(), "Target.createTarget" | "Target.attachToTarget");
 
-    for event in ctx.pending_events.drain(..) {
-        if let Ok(json) = serde_json::to_string(&event) {
+    if events_first {
+        for event in ctx.pending_events.drain(..) {
+            if let Ok(json) = serde_json::to_string(&event) {
+                let _ = reply_tx.send(json);
+            }
+        }
+        if let Ok(json) = serde_json::to_string(&response) {
             let _ = reply_tx.send(json);
+        }
+    } else {
+        if let Ok(json) = serde_json::to_string(&response) {
+            let _ = reply_tx.send(json);
+        }
+        for event in ctx.pending_events.drain(..) {
+            if let Ok(json) = serde_json::to_string(&event) {
+                let _ = reply_tx.send(json);
+            }
         }
     }
 
