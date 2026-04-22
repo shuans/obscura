@@ -183,11 +183,39 @@ pub async fn handle(
         "setLifecycleEventsEnabled" => Ok(json!({})),
         "addScriptToEvaluateOnNewDocument" => {
             let source = params.get("source").and_then(|v| v.as_str()).unwrap_or("");
+            let world_name = params.get("worldName").and_then(|v| v.as_str()).unwrap_or("");
+
             ctx.preload_counter += 1;
             let identifier = format!("{}", ctx.preload_counter);
             if !source.is_empty() {
                 ctx.preload_scripts.push((identifier.clone(), source.to_string()));
             }
+
+            // Playwright expects utility world context to be available promptly after
+            // addScriptToEvaluateOnNewDocument(worldName=...). If it does not observe
+            // this context, it may tear down the target with "Frame has been detached".
+            if !world_name.is_empty() {
+                if let Some(page) = ctx.get_session_page(session_id) {
+                    ctx.pending_events.push(CdpEvent {
+                        method: "Runtime.executionContextCreated".to_string(),
+                        params: json!({
+                            "context": {
+                                "id": 100,
+                                "origin": page.url_string(),
+                                "name": world_name,
+                                "uniqueId": format!("ctx-isolated-{}", page.id),
+                                "auxData": {
+                                    "isDefault": false,
+                                    "type": "isolated",
+                                    "frameId": page.frame_id,
+                                }
+                            }
+                        }),
+                        session_id: session_id.clone(),
+                    });
+                }
+            }
+
             Ok(json!({ "identifier": identifier }))
         }
         "removeScriptToEvaluateOnNewDocument" => {

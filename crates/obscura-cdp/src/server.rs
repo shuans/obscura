@@ -406,7 +406,7 @@ async fn process_cdp_message(
     // may resolve targetId first and fail to find the mapped page.
     let events_first = matches!(
         req.method.as_str(),
-        "Target.createTarget" | "Target.attachToTarget" | "Runtime.enable"
+        "Target.createTarget" | "Target.attachToTarget" | "Runtime.enable" | "Page.addScriptToEvaluateOnNewDocument"
     );
 
     if events_first {
