@@ -23,6 +23,7 @@ pub async fn handle(method: &str, _params: &Value) -> Result<Value, String> {
             }
         })),
         "setDownloadBehavior" => Ok(json!({})),
+        "setWindowBounds" => Ok(json!({})),
         "getWindowBounds" => Ok(json!({
             "bounds": { "left": 0, "top": 0, "width": 1280, "height": 720, "windowState": "normal" }
         })),
