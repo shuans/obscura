@@ -4,9 +4,9 @@ pub async fn handle(method: &str, _params: &Value) -> Result<Value, String> {
     match method {
         "getVersion" => Ok(json!({
             "protocolVersion": "1.3",
-            "product": "Obscura/0.1.0",
+            "product": "Obscura/0.1.1",
             "revision": "0",
-            "userAgent": "Obscura/0.1.0 (Headless Browser)",
+            "userAgent": "Obscura/0.1.1 (Headless Browser)",
             "jsVersion": "N/A",
         })),
         "close" => {

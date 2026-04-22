@@ -488,9 +488,9 @@ fn fast_path_response(text: &str) -> Option<String> {
         "Browser.getVersion" => {
             Some(json!({
                 "protocolVersion": "1.3",
-                "product": "Obscura/0.1.0",
+                "product": "Obscura/0.1.1",
                 "revision": "0",
-                "userAgent": "Obscura/0.1.0",
+                "userAgent": "Obscura/0.1.1",
                 "jsVersion": "V8",
             }))
         }
@@ -613,9 +613,9 @@ async fn handle_http_json(stream: TcpStream, port: u16, endpoint: &str) -> anyho
 
     let body = match endpoint {
         "version" => serde_json::to_string_pretty(&json!({
-            "Browser": "Obscura/0.1.0",
+            "Browser": "Obscura/0.1.1",
             "Protocol-Version": "1.3",
-            "User-Agent": "Obscura/0.1.0 (Headless Browser)",
+            "User-Agent": "Obscura/0.1.1 (Headless Browser)",
             "V8-Version": "N/A",
             "WebKit-Version": "N/A",
             "webSocketDebuggerUrl": format!("ws://127.0.0.1:{}/devtools/browser", port),
