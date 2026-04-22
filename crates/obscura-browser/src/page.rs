@@ -46,7 +46,11 @@ pub struct Page {
 impl Page {
     pub fn new(id: String, context: Arc<BrowserContext>) -> Self {
         let http_client = context.http_client.clone();
-        let frame_id = format!("{}.1", id);
+        // Chromium CDP main-frame id should match target id for a top-level page.
+        // Playwright resolves frame session by climbing parents until it finds a
+        // session keyed by target id; using "<target>.1" here makes main frame
+        // appear detached during early initialization.
+        let frame_id = id.clone();
         #[cfg(feature = "stealth")]
         let stealth_client = if context.stealth {
             Some(Arc::new(StealthHttpClient::new(context.cookie_jar.clone())))
