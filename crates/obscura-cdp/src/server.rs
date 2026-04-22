@@ -404,7 +404,10 @@ async fn process_cdp_message(
     // (Target.targetCreated/Target.attachedToTarget) to be observed before
     // the command response is handled. Otherwise browserContext.newPage()
     // may resolve targetId first and fail to find the mapped page.
-    let events_first = matches!(req.method.as_str(), "Target.createTarget" | "Target.attachToTarget");
+    let events_first = matches!(
+        req.method.as_str(),
+        "Target.createTarget" | "Target.attachToTarget" | "Runtime.enable"
+    );
 
     if events_first {
         for event in ctx.pending_events.drain(..) {
